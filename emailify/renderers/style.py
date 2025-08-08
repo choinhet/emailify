@@ -56,3 +56,24 @@ def render_style(style: Style) -> str:
     for prop, value in style_dict.items():
         rendered += map_style(prop, value)
     return rendered
+
+
+@lru_cache
+def extra_props() -> Dict[str, Dict[str, str]]:
+    resources_path = Path(str(pkg_resources.files(rsc)))
+    mjml_path = resources_path / "mjml.json"
+    return json.loads(mjml_path.read_text())
+
+
+def render_extra_props(component_name: str, style: Style) -> str:
+    extra_props_map = extra_props()
+    if component_name not in extra_props_map:
+        return ""
+    style_dict = style.model_dump(exclude_none=True)
+    cur_props = extra_props_map[component_name]
+    rendered = ""
+    for prop, value in style_dict.items():
+        if prop in cur_props:
+            _cur = cur_props[prop]
+            rendered += f'{_cur}="{value}" '
+    return rendered
