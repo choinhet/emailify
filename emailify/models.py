@@ -1,8 +1,29 @@
 from pathlib import Path
-from typing import Dict, Optional, Literal
+from typing import Any, Dict, Literal, Optional
 
 import pandas as pd
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+
+class StyleProperty(BaseModel):
+    prop: str
+    value: Any
+    mapped: str
+
+    @classmethod
+    def from_mapping_key(cls, key: str, mapped: str) -> "StyleProperty":
+        return cls.model_validate({"key": key, "mapped": mapped})
+
+    @model_validator(mode="before")
+    @classmethod
+    def _parse_from_key(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "key" in data and "mapped" in data:
+            key = data["key"]
+            if "|" not in key:
+                raise ValueError(f"Invalid style mapping key: {key}")
+            prop, raw_value = key.split("|", 1)
+            return {"prop": prop, "value": raw_value, "mapped": data["mapped"]}
+        return data
 
 
 class Style(BaseModel):
@@ -40,16 +61,6 @@ class Style(BaseModel):
         other_dict = other.model_dump(exclude_none=True)
         self_dict.update(other_dict)
         return self.model_validate(self_dict)
-
-    def render(self) -> str:
-        self_dict = self.model_dump(exclude_none=True)
-        rendered = ""
-        for prop, value in self_dict.items():
-            prop = prop.replace("_", "-")
-            if isinstance(value, int):
-                value = str(value) + "px"
-            rendered += f"{prop}:{value};"
-        return rendered
 
     def pl(self) -> int:
         return self.padding_left or self.padding or 0
@@ -103,19 +114,19 @@ class Table(Component):
     merge_equal_headers: bool = Field(default=True)
 
     def with_stripes(
-            self,
-            color: str = "#D0D0D0",
-            pattern: Literal["even", "odd"] = "odd",
+        self,
+        color: str = "#D0D0D0",
+        pattern: Literal["even", "odd"] = "odd",
     ) -> "Table":
         return self.model_copy(
             update=dict(
                 row_style={
-                    idx: self.row_style.get(idx, Style()).merge(
-                        Style(background=color)
+                    idx: (
+                        self.row_style.get(idx, Style()).merge(Style(background=color))
+                        if (pattern == "odd" and idx % 2 != 0)
+                        or (pattern == "even" and idx % 2 == 0)
+                        else self.row_style.get(idx, Style())
                     )
-                    if (pattern == "odd" and idx % 2 != 0)
-                       or (pattern == "even" and idx % 2 == 0)
-                    else self.row_style.get(idx, Style())
                     for idx in range(self.data.shape[0])
                 }
             )

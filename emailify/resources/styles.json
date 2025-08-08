@@ -1,0 +1,14 @@
+{
+    "bold|True": "font-weight: bold;",
+    "bold|False": "font-weight: normal;",
+    "font_color|%s": "color: %s;",
+    "font_size|%s": "font-size: %spx;",
+    "font_family|%s": "font-family: %s;",
+    "text_align|left": "text-align: left;",
+    "text_align|center": "text-align: center;",
+    "text_align|right": "text-align: right;",
+    "padding|%s": "padding: %spx;",
+    "padding_left|%s": "padding-left: %spx;",
+    "padding_right|%s": "padding-right: %spx;",
+    "padding_top|%s": "padding-top: %spx;"
+}
