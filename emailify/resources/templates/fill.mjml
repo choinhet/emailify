@@ -1,0 +1,3 @@
+<mj-spacer css-class="ef-fill" height="{{ height }}" width="{{ width }}" container-background-color="{{ background_color }}" />
+
+

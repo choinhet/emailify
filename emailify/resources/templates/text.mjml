@@ -1,0 +1,5 @@
+<mj-text css-class="ef-text" padding="10px 0px" style="{{ style }}" container-background-color="{{ background_color }}">
+  {{ text.text | safe }}
+</mj-text>
+
+

@@ -1,0 +1,3 @@
+<mj-image css-class="ef-image" src="{{ src }}" alt="" style="{{ style }}" />
+
+

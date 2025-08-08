@@ -27,25 +27,27 @@ def style_map() -> Dict[str, StyleProperty]:
     style_map = json.loads(styles_path.read_text())
     mappings = defaultdict(list)
     for key, mapped in style_map.items():
-        cur = StyleProperty.from_mapping_key(key, mapped)  # type: ignore
+        cur = StyleProperty.from_mapping_key(key, mapped)
         mappings[cur.prop].append(cur)
     return mappings
 
 
 def map_style(prop: str, value: Any) -> str:
     style_properties = style_map()
-    if prop in style_properties:
-        cur = style_properties[prop]
-        for c in cur:
-            if c.value == str(value):
-                return c.mapped
+    if prop not in style_properties:
+        return f"{prop.replace('_', '-')}:{value};"
 
-    if prop in style_properties:
-        cur = style_properties[prop]
-        for c in cur:
-            if c.value == "%s":
-                return c.mapped % value
-    return f"{prop.replace('_', '-')}:{value};"
+    cur = style_properties[prop]
+    for c in cur:
+        if c.value == str(value):
+            return c.render(value)
+
+    cur = style_properties[prop]
+    for c in cur:
+        if c.value == "%s":
+            return c.render(value) % value
+
+    return ""
 
 
 def render_style(style: Style) -> str:

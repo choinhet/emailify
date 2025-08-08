@@ -40,8 +40,26 @@ def table_with_merged_headers():
         }
     )
     df.rename(columns={"hello2": "hello"}, inplace=True)
-    component = ef.Table(data=df, merge_equal_headers=True)
-    rendered = ef.render(component)
+    rendered = ef.render(
+        ef.Text(
+            text="Hello, this is a table with merged headers",
+            style=ef.Style(background_color="#cbf4c9", padding_left="5px"),
+        ),
+        ef.Table(
+            data=df,
+            merge_equal_headers=True,
+            header_style={
+                "hello": ef.Style(background_color="#000000", font_color="#ffffff"),
+            },
+            column_style={
+                "hello3": ef.Style(background_color="#0d0d0", bold=True),
+            },
+            row_style={
+                1: ef.Style(background_color="#cbf4c9", bold=True),
+            },
+        ),
+        ef.Fill(style=ef.Style(background_color="#cbf4c9")),
+    )
     Path("example.html").write_text(rendered)
 
 
@@ -56,14 +74,14 @@ def table_hierarchy_styles():
         data=df,
         header_style={
             "super big column name, with a lot of text": ef.Style(
-                background="#000000", font_color="#ffffff"
+                background_color="#000000", font_color="#ffffff"
             ),
         },
         column_style={
-            "hello": ef.Style(background="#d0d0d0", bold=True),
+            "hello": ef.Style(background_color="#d0d0d0", bold=True),
         },
         row_style={
-            1: ef.Style(background="#cbf4c9", bold=True),
+            1: ef.Style(background_color="#cbf4c9", bold=True),
         },
     )
     rendered = ef.render(component, component)
