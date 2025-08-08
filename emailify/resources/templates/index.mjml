@@ -1,9 +1,10 @@
 <mjml>
-    <mj-body>
-        <mj-section>
-            <mj-column>
-                {{ content }}
-            </mj-column>
-        </mj-section>
-    </mj-body>
+  <mj-body width="900px">
+    <mj-section>
+      <mj-column>
+        {{ content }}
+      </mj-column>
+    </mj-section>
+  </mj-body>
+
 </mjml>

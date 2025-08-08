@@ -37,20 +37,20 @@ class Style(BaseModel):
             "right",
         ]
     ] = Field(default=None)
-    padding: Optional[int] = Field(default=None)
-    padding_left: Optional[int] = Field(default=None)
-    padding_right: Optional[int] = Field(default=None)
-    padding_top: Optional[int] = Field(default=None)
-    padding_bottom: Optional[int] = Field(default=None)
-    font_size: Optional[int] = Field(default=None)
+    padding: Optional[float] = Field(default=None)
+    padding_left: Optional[float] = Field(default=None)
+    padding_right: Optional[float] = Field(default=None)
+    padding_top: Optional[float] = Field(default=None)
+    padding_bottom: Optional[float] = Field(default=None)
+    font_size: Optional[float] = Field(default=None)
     font_color: Optional[str] = Field(default=None)
     font_family: Optional[str] = Field(default=None)
     bold: Optional[bool] = Field(default=None)
-    border: Optional[int] = Field(default=None)
-    border_left: Optional[int] = Field(default=None)
-    border_right: Optional[int] = Field(default=None)
-    border_top: Optional[int] = Field(default=None)
-    border_bottom: Optional[int] = Field(default=None)
+    border: Optional[float] = Field(default=None)
+    border_left: Optional[float] = Field(default=None)
+    border_right: Optional[float] = Field(default=None)
+    border_top: Optional[float] = Field(default=None)
+    border_bottom: Optional[float] = Field(default=None)
     border_style: Optional[str] = Field(default=None)
     border_color: Optional[str] = Field(default=None)
     background: Optional[str] = Field(default=None)
@@ -62,16 +62,16 @@ class Style(BaseModel):
         self_dict.update(other_dict)
         return self.model_validate(self_dict)
 
-    def pl(self) -> int:
+    def pl(self) -> float:
         return self.padding_left or self.padding or 0
 
-    def pt(self) -> int:
+    def pt(self) -> float:
         return self.padding_top or self.padding or 0
 
-    def pr(self) -> int:
+    def pr(self) -> float:
         return self.padding_right or self.padding or 0
 
-    def pb(self) -> int:
+    def pb(self) -> float:
         return self.padding_bottom or self.padding or 0
 
 
@@ -84,19 +84,19 @@ class Component(BaseModel):
 
 class Text(Component):
     text: str
-    width: int = Field(default=1)
-    height: int = Field(default=1)
+    width: float = Field(default=1)
+    height: float = Field(default=1)
 
 
 class Fill(Component):
-    width: int = Field(default=1)
-    height: int = Field(default=1)
+    width: float = Field(default=1)
+    height: float = Field(default=1)
 
 
 class Image(Component):
     path: Path
-    width: int = Field(default=1)
-    height: int = Field(default=1)
+    width: float = Field(default=1)
+    height: float = Field(default=1)
 
 
 class Table(Component):
@@ -104,13 +104,13 @@ class Table(Component):
     header_style: Dict[str, Style] = Field(default_factory=dict)
     body_style: Style = Field(default_factory=Style)
     column_style: Dict[str, Style] = Field(default_factory=dict)
-    column_width: Dict[str, int] = Field(default_factory=dict)
-    row_style: Dict[int, Style] = Field(default_factory=dict)
-    max_col_width: Optional[int] = Field(default=None)
+    column_width: Dict[str, float] = Field(default_factory=dict)
+    row_style: Dict[float, Style] = Field(default_factory=dict)
+    max_col_width: Optional[float] = Field(default=None)
     header_filters: bool = Field(default=True)
     default_style: bool = Field(default=True)
-    auto_width_tuning: int = Field(default=5)
-    auto_width_padding: int = Field(default=5)
+    auto_width_tuning: float = Field(default=5)
+    auto_width_padding: float = Field(default=5)
     merge_equal_headers: bool = Field(default=True)
 
     def with_stripes(
