@@ -1,0 +1,19 @@
+<mj-table align="center">
+    <tr>
+        {% for cell in table.data.columns %}
+            <th style="{{ header_styles[cell] }}">
+                {{ cell | wordwrap(20, break_long_words=True)
+                        | replace("\n", "<br>")
+                        | safe
+                }}
+            </th>
+        {% endfor %}
+    </tr>
+    {% for row in table.data.iterrows() %}
+        <tr>
+            {% for cell in row[1] %}
+                <td style="padding: 0 5px; border: 1px solid #9fa3ac;">{{ cell }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</mj-table>
