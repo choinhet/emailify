@@ -1,6 +1,8 @@
+import io
 from io import StringIO
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
 
 import emailify as ef
@@ -32,6 +34,13 @@ def simple_table():
 
 
 def table_with_merged_headers():
+    buf = io.BytesIO()
+    plt.plot([1, 2, 3], [2, 4, 1])
+    plt.tight_layout()
+    plt.savefig(buf, format="png", dpi=150)
+    plt.close()
+    buf.seek(0)
+
     df = pd.DataFrame(
         {
             "hello2": [1, 2, 3],
@@ -59,6 +68,7 @@ def table_with_merged_headers():
             },
         ),
         ef.Fill(style=ef.Style(background_color="#cbf4c9")),
+        ef.Graph(data=buf, format="png", width="600px"),
     )
     Path("example.html").write_text(rendered)
 

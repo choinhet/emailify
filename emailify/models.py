@@ -1,5 +1,6 @@
+from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, Literal, Optional
+from typing import Any, Dict, Literal, Optional, Union
 
 import pandas as pd
 from pydantic import BaseModel, Field, model_validator
@@ -54,6 +55,13 @@ class Style(BaseModel):
         frozen = True
 
     text_align: Optional[
+        Literal[
+            "left",
+            "center",
+            "right",
+        ]
+    ] = Field(default=None)
+    align: Optional[
         Literal[
             "left",
             "center",
@@ -120,6 +128,38 @@ class Image(Component):
     path: Path
     width: float = Field(default=1)
     height: float = Field(default=1)
+
+
+class Graph(Component):
+    data: Union[Path, str, bytes, BytesIO]
+    format: Literal["png", "jpeg", "jpg", "gif", "svg"] = Field(default="png")
+    width: str = Field(default="auto")
+    height: str = Field(default="auto")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_graph_input(cls, value: Any) -> Any:
+        if not isinstance(value, dict):
+            return value
+
+        data = value.get("data")
+        if isinstance(data, str):
+            value["data"] = Path(data)
+        elif isinstance(data, BytesIO):
+            value["data"] = data.getvalue()
+
+        if value.get("format") in (None, "") and isinstance(value.get("data"), Path):
+            suffix = value["data"].suffix.lower().lstrip(".")
+            if suffix in {"png", "jpeg", "jpg", "gif", "svg"}:
+                value["format"] = suffix
+        return value
+
+    @classmethod
+    def from_bytes(
+        cls, data: Union[bytes, BytesIO], format: str = "png", **kwargs
+    ) -> "Graph":
+        raw = data.getvalue() if isinstance(data, BytesIO) else data
+        return cls(data=raw, format=format, **kwargs)
 
 
 class Table(Component):

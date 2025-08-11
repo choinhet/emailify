@@ -20,5 +20,22 @@
         "background_color": "container-background-color",
         "height": "height",
         "width": "width"
+    },
+    "image": {
+        "width": "width",
+        "height": "height",
+        "border": "border",
+        "border_radius": "border-radius",
+        "border_left": "border-left",
+        "border_right": "border-right",
+        "border_top": "border-top",
+        "border_bottom": "border-bottom",
+        "background_color": "container-background-color",
+        "align": "align",
+        "padding": "padding",
+        "padding_left": "padding-left",
+        "padding_right": "padding-right",
+        "padding_top": "padding-top",
+        "padding_bottom": "padding-bottom"
     }
 }

@@ -65,14 +65,16 @@ def extra_props() -> Dict[str, Dict[str, str]]:
     return json.loads(mjml_path.read_text())
 
 
-def render_extra_props(component_name: str, style: Style) -> str:
+def render_extra_props(
+    component_name: str, style: Style, extra_dict: Dict[str, Any] = {}
+) -> str:
     extra_props_map = extra_props()
     if component_name not in extra_props_map:
         return ""
     style_dict = style.model_dump(exclude_none=True)
     cur_props = extra_props_map[component_name]
     rendered = ""
-    for prop, value in style_dict.items():
+    for prop, value in {**style_dict, **extra_dict}.items():
         if prop in cur_props:
             _cur = cur_props[prop]
             rendered += f'{_cur}="{value}" '
