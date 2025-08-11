@@ -47,8 +47,6 @@ def map_style(prop: str, value: Any) -> str:
         if c.value == "%s":
             return c.render(value) % value
 
-    return ""
-
 
 def render_style(style: Style) -> str:
     style_dict = style.model_dump(exclude_none=True)
@@ -69,8 +67,6 @@ def render_extra_props(
     component_name: str, style: Style, extra_dict: Dict[str, Any] = {}
 ) -> str:
     extra_props_map = extra_props()
-    if component_name not in extra_props_map:
-        return ""
     style_dict = style.model_dump(exclude_none=True)
     cur_props = extra_props_map[component_name]
     rendered = ""

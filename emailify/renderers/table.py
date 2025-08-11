@@ -39,17 +39,14 @@ def _get_style_font_size(*styles) -> int | None:
 def _compute_header_merge_spans(
     columns: List[str],
 ) -> Tuple[Dict[int, int], Dict[int, List[int]]]:
-    # Returns: span_by_start, indices_by_header (only for groups with length >= 2 and contiguous)
     indices_by_header: Dict[str, List[int]] = {}
     for idx, header in enumerate(columns):
         if header not in indices_by_header:
             indices_by_header[header] = [idx]
         else:
-            # Only extend if contiguous with previous index
             if indices_by_header[header][-1] == idx - 1:
                 indices_by_header[header].append(idx)
             else:
-                # reset non-contiguous sequences; keep only newest contiguous run
                 indices_by_header[header] = [idx]
 
     span_by_start: Dict[int, int] = {}

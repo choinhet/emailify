@@ -68,7 +68,7 @@ def table_with_merged_headers():
             },
         ),
         ef.Fill(style=ef.Style(background_color="#cbf4c9")),
-        ef.Graph(data=buf, format="png", width="600px"),
+        ef.Image(data=buf, format="png", width="600px"),
     )
     Path("example.html").write_text(rendered)
 

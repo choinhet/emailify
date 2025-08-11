@@ -1,7 +1,7 @@
 [project]
 name = "emailify"
 version = "0.1.0"
-description = ""
+description = "Emailify is a library for creating email templates in Python."
 readme = "README.md"
 requires-python = ">=3.9.10"
 dependencies = [
@@ -15,4 +15,14 @@ dependencies = [
 [dependency-groups]
 dev = [
     "matplotlib>=3.9.4",
+    "pytest>=8.3.3",
+    "pytest-cov>=4.1.0",
+    "coverage>=7.6.1",
+    "pytest-mock>=3.14.0",
+    "pytest-asyncio>=0.25.3",
+    "debugpy>=1.8.13",
+    "pyright>=1.1.398",
 ]
+
+[tool.setuptools]
+packages = ["emailify"]

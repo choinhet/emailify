@@ -21,8 +21,6 @@ class StyleProperty(BaseModel):
     def _parse_from_key(cls, data: Any) -> Any:
         if isinstance(data, dict) and "key" in data and "mapped" in data:
             key = data["key"]
-            if "|" not in key:
-                raise ValueError(f"Invalid style mapping key: {key}")
             parts = str(key).split("|", 2)
             if len(parts) == 2:
                 prop, raw_value = parts
@@ -93,18 +91,6 @@ class Style(BaseModel):
         self_dict.update(other_dict)
         return self.model_validate(self_dict)
 
-    def pl(self) -> float:
-        return self.padding_left or self.padding or 0
-
-    def pt(self) -> float:
-        return self.padding_top or self.padding or 0
-
-    def pr(self) -> float:
-        return self.padding_right or self.padding or 0
-
-    def pb(self) -> float:
-        return self.padding_bottom or self.padding or 0
-
 
 class Component(BaseModel):
     style: Style = Field(default_factory=Style)
@@ -125,12 +111,6 @@ class Fill(Component):
 
 
 class Image(Component):
-    path: Path
-    width: float = Field(default=1)
-    height: float = Field(default=1)
-
-
-class Graph(Component):
     data: Union[Path, str, bytes, BytesIO]
     format: Literal["png", "jpeg", "jpg", "gif", "svg"] = Field(default="png")
     width: str = Field(default="auto")
@@ -138,7 +118,7 @@ class Graph(Component):
 
     @model_validator(mode="before")
     @classmethod
-    def _normalize_graph_input(cls, value: Any) -> Any:
+    def _normalize_image_input(cls, value: Any) -> Any:
         if not isinstance(value, dict):
             return value
 
@@ -153,13 +133,6 @@ class Graph(Component):
             if suffix in {"png", "jpeg", "jpg", "gif", "svg"}:
                 value["format"] = suffix
         return value
-
-    @classmethod
-    def from_bytes(
-        cls, data: Union[bytes, BytesIO], format: str = "png", **kwargs
-    ) -> "Graph":
-        raw = data.getvalue() if isinstance(data, BytesIO) else data
-        return cls(data=raw, format=format, **kwargs)
 
 
 class Table(Component):
