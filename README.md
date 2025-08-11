@@ -12,6 +12,37 @@ pip install emailify
 
 ## Usage
 
+### Example
+
+```python
+    rendered = ef.render(
+        ef.Text(
+            text="Hello, this is a table with merged headers",
+            style=ef.Style(background_color="#cbf4c9", padding_left="5px"),
+        ),
+        ef.Table(
+            data=df,
+            merge_equal_headers=True,
+            header_style={
+                "hello": ef.Style(background_color="#000000", font_color="#ffffff"),
+            },
+            column_style={
+                "hello3": ef.Style(background_color="#0d0d0", bold=True),
+            },
+            row_style={
+                1: ef.Style(background_color="#cbf4c9", bold=True),
+            },
+        ),
+        ef.Fill(style=ef.Style(background_color="#cbf4c9")),
+        ef.Image(data=buf, format="png", width="600px"),
+    )
+```
+
+#### Result
+
+![image.png](static/image.png)
+
+
 ### Basic Table
 ```python
 import pandas as pd

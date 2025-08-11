@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from PIL import ImageFont
 
@@ -12,7 +12,9 @@ DEFAULT_FONT_FAMILY = "Arial"
 DEFAULT_FONT_SIZE = 11
 
 
-def _get_text_size(text: str, font_size: int | None, font_family: str | None) -> float:
+def _get_text_size(
+    text: str, font_size: Optional[int], font_family: Optional[str]
+) -> float:
     size = font_size or DEFAULT_FONT_SIZE
     family = (font_family or DEFAULT_FONT_FAMILY).lower()
     try:
@@ -22,14 +24,14 @@ def _get_text_size(text: str, font_size: int | None, font_family: str | None) ->
     return float(font.getlength(str(text)))
 
 
-def _get_style_font_family(*styles) -> str | None:
+def _get_style_font_family(*styles) -> Optional[str]:
     current = None
     for s in filter(None, styles):
         current = getattr(s, "font_family", None) or current
     return current
 
 
-def _get_style_font_size(*styles) -> int | None:
+def _get_style_font_size(*styles) -> Optional[int]:
     current = None
     for s in filter(None, styles):
         current = getattr(s, "font_size", None) or current
