@@ -1,4 +1,5 @@
 from io import BytesIO
+from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Union
 
@@ -111,9 +112,9 @@ class Fill(Component):
 
 
 class Image(Component):
-    data: Union[Path, str, bytes, BytesIO]
+    data: Union[PathLike, bytes, BytesIO]
     format: Literal["png", "jpeg", "jpg", "gif", "svg"] = Field(default="png")
-    width: str = Field(default="auto")
+    width: str = Field(default="800px")
     height: str = Field(default="auto")
 
     @model_validator(mode="before")

@@ -1,4 +1,5 @@
 from base64 import b64encode
+from pathlib import Path
 
 from emailify.models import Image
 from emailify.renderers.core import _render
@@ -11,9 +12,10 @@ def _as_data_uri(content: bytes, mime: str) -> str:
 
 
 def render_image(image: Image) -> str:
-    src = str(image.data)
+    mime = "image/svg+xml" if image.format == "svg" else f"image/{image.format}"
+    if isinstance(image.data, (Path, str)):
+        src = Path(str(image.data)).read_bytes()
     if isinstance(image.data, (bytes, bytearray)):
-        mime = "image/svg+xml" if image.format == "svg" else f"image/{image.format}"
         src = _as_data_uri(image.data, mime)
 
     cur_style = merge_styles(IMAGE_STYLE, image.style)
