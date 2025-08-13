@@ -12,11 +12,14 @@ def _as_data_uri(content: bytes, mime: str) -> str:
 
 
 def render_image(image: Image) -> str:
-    mime = "image/svg+xml" if image.format == "svg" else f"image/{image.format}"
-    if isinstance(image.data, (Path, str)):
-        src = Path(str(image.data)).read_bytes()
-    if isinstance(image.data, (bytes, bytearray)):
-        src = _as_data_uri(image.data, mime)
+    ext = "jpeg" if image.format in ("jpg", "jpeg") else image.format
+    mime = "image/svg+xml" if ext == "svg" else f"image/{ext}"
+    content = (
+        image.data
+        if isinstance(image.data, (bytes, bytearray))
+        else Path(image.data).read_bytes()
+    )
+    src = _as_data_uri(content, mime)
 
     cur_style = merge_styles(IMAGE_STYLE, image.style)
     return _render(

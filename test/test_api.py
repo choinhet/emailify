@@ -1,4 +1,6 @@
 import io
+import shutil
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -12,6 +14,10 @@ def test_api():
     plt.plot([1, 2, 3], [2, 4, 1])
     plt.tight_layout()
     plt.savefig(buf, format="png", dpi=150)
+    temp_path = Path("temp")
+    temp_path.mkdir(exist_ok=True)
+    img = temp_path / "image.png"
+    plt.savefig(img, format="png", dpi=150)
     plt.close()
     buf.seek(0)
 
@@ -44,6 +50,7 @@ def test_api():
         ef.Fill(style=ef.Style(background_color="#cbf4c9")),
         ef.Image(data=buf, format="png", width="600px"),
     )
+    shutil.rmtree(temp_path, ignore_errors=True)
     assert rendered is not None
 
 
