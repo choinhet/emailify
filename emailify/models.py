@@ -1,6 +1,5 @@
 from io import BytesIO
 from os import PathLike
-from pathlib import Path
 from typing import Any, Dict, Literal, Optional, Union
 
 import pandas as pd
@@ -34,7 +33,6 @@ class StyleProperty(BaseModel):
                 "mapped": data["mapped"],
                 "unit": unit,
             }
-        return data
 
     def is_float(self, value: Any) -> bool:
         try:
@@ -112,28 +110,10 @@ class Fill(Component):
 
 
 class Image(Component):
-    data: Union[PathLike, bytes, BytesIO]
+    data: Union[PathLike, bytes, bytearray, BytesIO]
     format: Literal["png", "jpeg", "jpg", "gif", "svg"] = Field(default="png")
     width: str = Field(default="800px")
-    height: str = Field(default="auto")
-
-    @model_validator(mode="before")
-    @classmethod
-    def _normalize_image_input(cls, value: Any) -> Any:
-        if not isinstance(value, dict):
-            return value
-
-        data = value.get("data")
-        if isinstance(data, str):
-            value["data"] = Path(data)
-        elif isinstance(data, BytesIO):
-            value["data"] = data.getvalue()
-
-        if value.get("format") in (None, "") and isinstance(value.get("data"), Path):
-            suffix = value["data"].suffix.lower().lstrip(".")
-            if suffix in {"png", "jpeg", "jpg", "gif", "svg"}:
-                value["format"] = suffix
-        return value
+    height: Optional[str] = Field(default=None)
 
 
 class Table(Component):
@@ -141,7 +121,7 @@ class Table(Component):
     header_style: Dict[str, Style] = Field(default_factory=dict)
     body_style: Style = Field(default_factory=Style)
     column_style: Dict[str, Style] = Field(default_factory=dict)
-    column_width: Dict[str, float] = Field(default_factory=dict)
+    column_widths: Dict[str, float] = Field(default_factory=dict)
     row_style: Dict[float, Style] = Field(default_factory=dict)
     max_col_width: Optional[float] = Field(default=None)
     header_filters: bool = Field(default=True)

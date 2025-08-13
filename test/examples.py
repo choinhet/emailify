@@ -50,6 +50,7 @@ def table_with_merged_headers():
         {
             "hello2": [1, 2, 3],
             "hello": ["My", "Name", "Is"],
+            "Really long column name": [1, 2, 3],
             "hello3": [1, 2, 3],
         }
     )
@@ -63,7 +64,13 @@ def table_with_merged_headers():
             data=df,
             merge_equal_headers=True,
             header_style={
-                "hello": ef.Style(background_color="#000000", font_color="#ffffff"),
+                "hello": ef.Style(
+                    background_color="#000000",
+                    font_color="#ffffff",
+                ),
+                "hello3": ef.Style(
+                    font_family="unknown",
+                ),
             },
             column_style={
                 "hello3": ef.Style(background_color="#0d0d0", bold=True),
@@ -71,10 +78,14 @@ def table_with_merged_headers():
             row_style={
                 1: ef.Style(background_color="#cbf4c9", bold=True),
             },
+            column_widths={
+                "hello": 10,
+            },
         ),
         ef.Fill(style=ef.Style(background_color="#cbf4c9")),
         ef.Image(data=img, format="png", width="600px"),
         ef.Image(data=buf, format="png", width="600px"),
+        ef.Table(data=df).with_stripes(),
     )
     shutil.rmtree(temp_path, ignore_errors=True)
     Path("example.html").write_text(rendered)

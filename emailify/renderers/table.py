@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Tuple
 
 from PIL import ImageFont
 
-from emailify.models import Table
+from emailify.models import Style, Table
 from emailify.renderers.core import _render
 from emailify.renderers.style import merge_styles, render_style
 from emailify.styles.table_default import COL_STYLE, HEADER_STYLE
@@ -22,20 +22,6 @@ def _get_text_size(
     except Exception:
         font = ImageFont.load_default()
     return float(font.getlength(str(text)))
-
-
-def _get_style_font_family(*styles) -> Optional[str]:
-    current = None
-    for s in filter(None, styles):
-        current = getattr(s, "font_family", None) or current
-    return current
-
-
-def _get_style_font_size(*styles) -> Optional[int]:
-    current = None
-    for s in filter(None, styles):
-        current = getattr(s, "font_size", None) or current
-    return current
 
 
 def _compute_header_merge_spans(
@@ -62,6 +48,14 @@ def _compute_header_merge_spans(
     return span_by_start, contiguous_only
 
 
+def render_style_dict(style_dict: Dict[str, Style]) -> Dict[str, str]:
+    return {
+        c: render_style(cur)
+        for c in style_dict.keys()
+        if (cur := style_dict.get(c)) is not None
+    }
+
+
 def render_table(table: Table) -> str:
     row_styles: Dict[int, str] = {}
     header_styles: Dict[str, str] = {}
@@ -73,20 +67,13 @@ def render_table(table: Table) -> str:
     body_nowrap_cols: set[str] = set()
 
     for header in table.data.columns:
-        header_styles[header] = render_style(
-            merge_styles(
-                HEADER_STYLE,
-                table.header_style.get(header),
-            )
+        header_styles[header] = merge_styles(
+            HEADER_STYLE,
+            table.header_style.get(header),
         )
 
     for col in table.data.columns:
-        col_styles[col] = render_style(
-            merge_styles(
-                COL_STYLE,
-                table.column_style.get(col),
-            )
-        )
+        col_styles[col] = merge_styles(COL_STYLE, table.column_style.get(col))
 
     if table.merge_equal_headers:
         spans_by_start, groups = _compute_header_merge_spans(list(table.data.columns))
@@ -97,23 +84,18 @@ def render_table(table: Table) -> str:
     if table.data is not None and table.data.shape[1] > 0:
         max_cap = table.max_col_width if table.max_col_width is not None else 10**9
         for col_idx, col_name in enumerate(table.data.columns):
-            set_width = table.column_width.get(col_name)
+            set_width = table.column_widths.get(col_name)
             if set_width is not None:
                 col_widths[col_name] = int(set_width)
                 continue
             series = table.data.iloc[:, col_idx]
             cur_skip = col_idx in skip_header_indices
-            header_font_size = _get_style_font_size(
-                HEADER_STYLE,
-                table.style,
-                table.header_style.get(col_name),
-            )
-            header_font_family = _get_style_font_family(
-                HEADER_STYLE,
-                table.style,
-                table.header_style.get(col_name),
-            )
+            cur_header_style = header_styles.get(col_name)
+
+            header_font_size = cur_header_style.font_size
+            header_font_family = cur_header_style.font_family
             header_px = _get_text_size(col_name, header_font_size, header_font_family)
+
             header_longest_word_px = 0.0
             for word in filter(None, re.split(r"[\s/()_-]+", str(col_name))):
                 header_longest_word_px = max(
@@ -121,28 +103,19 @@ def render_table(table: Table) -> str:
                     _get_text_size(word, header_font_size, header_font_family),
                 )
 
-            col_font_size = _get_style_font_size(
-                COL_STYLE,
-                table.style,
-                table.body_style,
-                table.column_style.get(col_name),
+            cur_col_style = col_styles.get(col_name)
+            col_font_size = cur_col_style.font_size
+            col_font_family = cur_col_style.font_family
+
+            body_max_px = float(
+                series.astype(str)
+                .map(lambda it: _get_text_size(it, col_font_size, col_font_family))
+                .max()
             )
-            col_font_family = _get_style_font_family(
-                COL_STYLE,
-                table.style,
-                table.body_style,
-                table.column_style.get(col_name),
-            )
-            try:
-                body_max_px = float(
-                    series.astype(str)
-                    .map(lambda it: _get_text_size(it, col_font_size, col_font_family))
-                    .max()
-                )
-            except Exception:
-                body_max_px = 0.0
+
             small_body_threshold = 90.0
             wrap_factor = 1.6
+
             should_wrap_header = (
                 header_px > max(body_max_px, 40.0) * wrap_factor
                 and body_max_px <= small_body_threshold
@@ -167,15 +140,6 @@ def render_table(table: Table) -> str:
             if alnum_count > 0 and digit_count / alnum_count >= 0.5:
                 body_nowrap_cols.add(col_name)
 
-    body_style = render_style(
-        merge_styles(
-            table.body_style,
-        )
-    )
-
-    for idx in range(table.data.shape[0]):
-        row_styles[idx] = render_style(merge_styles(table.row_style.get(idx)))
-
     headers_render: List[Dict[str, object]] = []
     for idx, header in enumerate(table.data.columns):
         if idx in skip_header_indices:
@@ -185,6 +149,7 @@ def render_table(table: Table) -> str:
         for j in range(idx, idx + span):
             name = table.data.columns[j]
             span_width += col_widths.get(name, 0)
+
         headers_render.append(
             {
                 "text": header,
@@ -197,10 +162,10 @@ def render_table(table: Table) -> str:
     return _render(
         "table",
         table=table,
-        header_styles=header_styles,
-        col_styles=col_styles,
-        row_styles=row_styles,
-        body_style=body_style,
+        header_styles=render_style_dict(header_styles),
+        col_styles=render_style_dict(col_styles),
+        row_styles=render_style_dict(row_styles),
+        body_style=render_style(table.body_style),
         col_widths=col_widths,
         headers_render=headers_render,
         body_nowrap_cols=body_nowrap_cols,

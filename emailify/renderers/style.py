@@ -1,6 +1,6 @@
 import importlib.resources as pkg_resources
 from collections import defaultdict
-from functools import lru_cache
+from functools import lru_cache, reduce
 from pathlib import Path
 from typing import Any, Dict
 
@@ -11,13 +11,7 @@ from emailify.models import Style, StyleProperty
 
 
 def merge_styles(*styles: Style) -> Style:
-    styles = list(filter(None, styles))
-    if len(styles) == 0:
-        return Style()
-    _style = styles[0]
-    for s in styles[1:]:
-        _style = _style.merge(s)
-    return _style
+    return reduce(lambda a, b: a.merge(b), filter(None, styles), Style())
 
 
 @lru_cache

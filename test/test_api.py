@@ -25,10 +25,13 @@ def test_api():
         {
             "hello2": [1, 2, 3],
             "hello": ["My", "Name", "Is"],
-            "hello3": [1, 2, 3],
+            "hello3": ["My", "Name", "Is"],
+            "Really long column name": [1, 2, 3],
+            "hello4": ["This is a long column name"] * 3,
         }
     )
     df.rename(columns={"hello2": "hello"}, inplace=True)
+    sec_df = df.rename(columns={"hello4": "hello"})
     rendered = ef.render(
         ef.Text(
             text="Hello, this is a table with merged headers",
@@ -38,7 +41,13 @@ def test_api():
             data=df,
             merge_equal_headers=True,
             header_style={
-                "hello": ef.Style(background_color="#000000", font_color="#ffffff"),
+                "hello": ef.Style(
+                    background_color="#000000",
+                    font_color="#ffffff",
+                ),
+                "hello3": ef.Style(
+                    font_family="unknown",
+                ),
             },
             column_style={
                 "hello3": ef.Style(background_color="#0d0d0", bold=True),
@@ -46,9 +55,15 @@ def test_api():
             row_style={
                 1: ef.Style(background_color="#cbf4c9", bold=True),
             },
+            column_widths={
+                "hello": 100,
+            },
         ),
         ef.Fill(style=ef.Style(background_color="#cbf4c9")),
+        ef.Image(data=img, format="png", width="600px"),
         ef.Image(data=buf, format="png", width="600px"),
+        ef.Table(data=df).with_stripes(),
+        ef.Table(data=sec_df),
     )
     shutil.rmtree(temp_path, ignore_errors=True)
     assert rendered is not None
