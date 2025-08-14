@@ -4,7 +4,7 @@ from pathlib import Path
 
 from emailify.models import Image
 from emailify.renderers.core import _render
-from emailify.renderers.style import merge_styles, render_extra_props, render_style
+from emailify.renderers.style import merge_styles, render_extra_props
 from emailify.styles.image_default import IMAGE_STYLE
 
 
@@ -27,7 +27,6 @@ def render_image(image: Image) -> str:
         "image",
         image=image,
         src=src,
-        style=render_style(cur_style),
         extra_props=render_extra_props(
             "image", cur_style, {"width": image.width, "height": image.height}
         ),

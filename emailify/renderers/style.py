@@ -1,5 +1,4 @@
 import importlib.resources as pkg_resources
-from collections import defaultdict
 from functools import lru_cache, reduce
 from pathlib import Path
 from typing import Any, Dict
@@ -19,27 +18,44 @@ def style_map() -> Dict[str, StyleProperty]:
     resources_path = Path(str(pkg_resources.files(rsc)))
     styles_path = resources_path / "styles.json"
     style_map = json.loads(styles_path.read_text())
-    mappings = defaultdict(list)
-    for key, mapped in style_map.items():
-        cur = StyleProperty.from_mapping_key(key, mapped)
-        mappings[cur.prop].append(cur)
-    return mappings
+    return {style["name"]: StyleProperty.model_validate(style) for style in style_map}
 
 
-def map_style(prop: str, value: Any) -> str:
+def is_numeric_only(value: Any) -> bool:
+    try:
+        float(str(value))
+        return True
+    except ValueError:
+        return False
+
+
+def render_prop(
+    prop: str,
+    value: Any,
+    value_template: str,
+) -> str:
+    if is_numeric_only(value):
+        value = f"{value}px"
+
+    return value_template.format(prop=prop, value=value)
+
+
+def map_style(
+    prop: str,
+    value: Any,
+    template: str = "{prop}:{value};",
+    no_value_template: str = "{prop};",
+) -> str:
     style_properties = style_map()
-    if prop not in style_properties:
-        return f"{prop.replace('_', '-')}:{value};"
-
-    cur = style_properties[prop]
-    for c in cur:
-        if c.value == str(value):
-            return c.render(value)
-
-    cur = style_properties[prop]
-    for c in cur:
-        if c.value == "%s":
-            return c.render(value) % value
+    value = str(value)
+    if prop in style_properties:
+        cur = style_properties[prop]
+        if value in cur.value_map:
+            value = cur.value_map[value]
+        prop = cur.display
+    prop = prop.replace("_", "-")
+    rendered = render_prop(prop, value, template)
+    return rendered
 
 
 def render_style(style: Style) -> str:
@@ -65,7 +81,9 @@ def render_extra_props(
     cur_props = extra_props_map[component_name]
     rendered = ""
     for prop, value in {**style_dict, **extra_dict}.items():
+        if prop is None or value is None:
+            continue
         if prop in cur_props:
             _cur = cur_props[prop]
-            rendered += f'{_cur}="{value}" '
+            rendered += map_style(_cur, value, template='{prop}="{value}" ')
     return rendered

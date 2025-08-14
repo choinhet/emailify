@@ -1,4 +1,4 @@
-<mj-table align="left" width="100%" padding="0" css-class="ef-table" style="margin-left:0;">
+<mj-table align="left" width="100%" padding="0" css-class="ef-table">
   <tr>
     {% for head in headers_render %}
     <th {% if head.span > 1 %} colspan="{{ head.span }}" {% endif %} style="{{ header_styles[head.text] }} {% if head.wrap %} white-space: normal; word-break: keep-all; {% else %} white-space: nowrap; {% endif %} width: {{ head.width }}px;">

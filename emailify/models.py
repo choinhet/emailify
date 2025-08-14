@@ -1,50 +1,15 @@
 from io import BytesIO
 from os import PathLike
-from typing import Any, Dict, Literal, Optional, Union
+from typing import Dict, Literal, Optional, Union
 
 import pandas as pd
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field
 
 
 class StyleProperty(BaseModel):
-    prop: str
-    value: Any
-    mapped: str
-    unit: Optional[str] = None
-
-    @classmethod
-    def from_mapping_key(cls, key: str, mapped: str) -> "StyleProperty":
-        return cls.model_validate({"key": key, "mapped": mapped})
-
-    @model_validator(mode="before")
-    @classmethod
-    def _parse_from_key(cls, data: Any) -> Any:
-        if isinstance(data, dict) and "key" in data and "mapped" in data:
-            key = data["key"]
-            parts = str(key).split("|", 2)
-            if len(parts) == 2:
-                prop, raw_value = parts
-                unit = None
-            else:
-                prop, raw_value, unit = parts
-            return {
-                "prop": prop,
-                "value": raw_value,
-                "mapped": data["mapped"],
-                "unit": unit,
-            }
-
-    def is_float(self, value: Any) -> bool:
-        try:
-            float(value)
-            return True
-        except ValueError:
-            return False
-
-    def render(self, value: Any) -> str:
-        if self.unit and value is not None and self.is_float(value):
-            return f"{self.mapped}{self.unit};"
-        return f"{self.mapped};"
+    name: str
+    display: str
+    value_map: Dict[str, str] = Field(default_factory=dict)
 
 
 class Style(BaseModel):
