@@ -1,7 +1,7 @@
 import importlib.resources as pkg_resources
 from functools import lru_cache, reduce
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from pandas.io.parquet import json
 
@@ -43,13 +43,17 @@ def render_prop(
 def map_style(
     prop: str,
     value: Any,
+    prev_prop: Optional[str] = None,
     template: str = "{prop}:{value};",
     no_value_template: str = "{prop};",
 ) -> str:
     style_properties = style_map()
     value = str(value)
-    if prop in style_properties:
-        cur = style_properties[prop]
+    if not prev_prop:
+        prev_prop = prop
+
+    if prev_prop in style_properties:
+        cur = style_properties[prev_prop]
         if value in cur.value_map:
             value = cur.value_map[value]
         prop = cur.display
@@ -85,5 +89,10 @@ def render_extra_props(
             continue
         if prop in cur_props:
             _cur = cur_props[prop]
-            rendered += map_style(_cur, value, template='{prop}="{value}" ')
+            rendered += map_style(
+                prop=_cur,
+                value=value,
+                prev_prop=prop,
+                template='{prop}="{value}" ',
+            )
     return rendered

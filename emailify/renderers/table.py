@@ -3,15 +3,16 @@ from email.mime.application import MIMEApplication
 from html.parser import HTMLParser
 from io import StringIO
 from tkinter import Image
-from typing import Any, Dict, List, Optional, Text, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from PIL import ImageFont
 
-from emailify.models import Component, Fill, Link, Style, Table
+from emailify.models import Component, Fill, Link, Style, Table, Text
 from emailify.renderers.core import _render
 from emailify.renderers.fill import render_fill
 from emailify.renderers.image import render_image
 from emailify.renderers.link import render_link
+from emailify.renderers.render_mjml import mjml2html
 from emailify.renderers.style import merge_styles, render_style
 from emailify.renderers.text import render_text
 from emailify.styles.table_default import COL_STYLE, HEADER_STYLE
@@ -27,10 +28,36 @@ TABLE_RENDER_MAP = {
 }
 
 
+EXTRACT_RE = re.compile(r"__BEG__.*?<div\b[^>]*>(.*?)<\/div>.*?__END__", re.DOTALL)
+
+
 def _render_component(
     component: Component,
 ) -> tuple[str, list[MIMEApplication]]:
-    return TABLE_RENDER_MAP[type(component)](component)
+    parts: list[str] = []
+    attachments: list[MIMEApplication] = []
+
+    components = [
+        Text(text="__BEG__"),
+        component,
+        Text(text="__END__"),
+    ]
+    for component in components:
+        body, cur_attachments = TABLE_RENDER_MAP[type(component)](component)
+        parts.append(body)
+        attachments.extend(cur_attachments)
+
+    body_str = _render(
+        "index",
+        content="".join(parts),
+    )
+    html = mjml2html(body_str)
+
+    match = EXTRACT_RE.search(html)
+    if match:
+        html = match.group(1).strip()
+
+    return html, attachments
 
 
 class MLStripper(HTMLParser):

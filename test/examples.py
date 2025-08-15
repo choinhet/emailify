@@ -62,7 +62,7 @@ def table_with_merged_headers():
     html, _attachments = ef.render(
         ef.Text(
             text="Hello, this is a table with merged headers",
-            style=ef.Style(background_color="#cbf4c9", padding_left="5px"),
+            style=ef.Style(background_color="#cbf4c9", padding_left="5px", bold=True),
         ),
         ef.Link(text="Hello", href="https://www.google.com"),
         ef.Table(
