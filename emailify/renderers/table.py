@@ -1,5 +1,7 @@
 import re
 from email.mime.application import MIMEApplication
+from html.parser import HTMLParser
+from io import StringIO
 from tkinter import Image
 from typing import Any, Dict, List, Optional, Text, Tuple
 
@@ -31,9 +33,29 @@ def _render_component(
     return TABLE_RENDER_MAP[type(component)](component)
 
 
+class MLStripper(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.text = StringIO()
+
+    def handle_data(self, d):
+        self.text.write(d)
+
+    def get_data(self):
+        return self.text.getvalue()
+
+
+def strip_tags(html: str) -> str:
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+
 def _get_text_size(
     text: str, font_size: Optional[int], font_family: Optional[str]
 ) -> float:
+    text = strip_tags(text)
     size = font_size or DEFAULT_FONT_SIZE
     family = (font_family or DEFAULT_FONT_FAMILY).lower()
     try:
