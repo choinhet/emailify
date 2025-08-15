@@ -2,23 +2,22 @@ import io
 import shutil
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
+from PIL import Image as PILImage
 
 import emailify as ef
 
 
 def test_api():
     buf = io.BytesIO()
-    plt.plot([1, 2, 3], [2, 4, 1])
-    plt.tight_layout()
-    plt.savefig(buf, format="png", dpi=150)
+    # Create a simple 10x10 red image using Pillow
+    pil_img = PILImage.new("RGB", (10, 10), color=(255, 0, 0))
+    pil_img.save(buf, format="PNG")
     temp_path = Path("temp")
     temp_path.mkdir(exist_ok=True)
     img = temp_path / "image.png"
-    plt.savefig(img, format="png", dpi=150)
-    plt.close()
+    pil_img.save(img, format="PNG")
     buf.seek(0)
 
     df = pd.DataFrame(
@@ -32,7 +31,7 @@ def test_api():
     )
     df.rename(columns={"hello2": "hello"}, inplace=True)
     sec_df = df.rename(columns={"hello4": "hello"})
-    rendered = ef.render(
+    html, attachments = ef.render(
         ef.Text(
             text="Hello, this is a table with merged headers",
             style=ef.Style(background_color="#cbf4c9", padding_left="5"),
@@ -66,7 +65,9 @@ def test_api():
         ef.Table(data=sec_df),
     )
     shutil.rmtree(temp_path, ignore_errors=True)
-    assert rendered is not None
+    assert html is not None
+    # Two images added above should yield two attachments
+    assert len(attachments) == 2
 
 
 if __name__ == "__main__":

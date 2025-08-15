@@ -1,6 +1,8 @@
 import re
 from typing import Dict, List, Optional, Tuple
 
+from email.mime.application import MIMEApplication
+
 from PIL import ImageFont
 
 from emailify.models import Style, Table
@@ -56,7 +58,7 @@ def render_style_dict(style_dict: Dict[str, Style]) -> Dict[str, str]:
     }
 
 
-def render_table(table: Table) -> str:
+def render_table(table: Table) -> tuple[str, list[MIMEApplication]]:
     row_styles: Dict[int, str] = {}
     header_styles: Dict[str, str] = {}
     col_styles: Dict[str, str] = {}
@@ -159,7 +161,7 @@ def render_table(table: Table) -> str:
             }
         )
 
-    return _render(
+    body = _render(
         "table",
         table=table,
         header_styles=render_style_dict(header_styles),
@@ -170,3 +172,4 @@ def render_table(table: Table) -> str:
         headers_render=headers_render,
         body_nowrap_cols=body_nowrap_cols,
     )
+    return body, []

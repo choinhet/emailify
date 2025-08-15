@@ -30,8 +30,8 @@ def sample_data():
 def simple_table():
     df = sample_data()
     component = ef.Table(data=df)
-    rendered = ef.render(component)
-    Path("example.html").write_text(rendered)
+    html, _attachments = ef.render(component)
+    Path("example.html").write_text(html)
 
 
 def table_with_merged_headers():
@@ -55,7 +55,7 @@ def table_with_merged_headers():
         }
     )
     df.rename(columns={"hello2": "hello"}, inplace=True)
-    rendered = ef.render(
+    html, _attachments = ef.render(
         ef.Text(
             text="Hello, this is a table with merged headers",
             style=ef.Style(background_color="#cbf4c9", padding_left="5px"),
@@ -88,7 +88,7 @@ def table_with_merged_headers():
         ef.Table(data=df).with_stripes(),
     )
     shutil.rmtree(temp_path, ignore_errors=True)
-    Path("example.html").write_text(rendered)
+    Path("example.html").write_text(html)
 
 
 def table_hierarchy_styles():
@@ -112,9 +112,9 @@ def table_hierarchy_styles():
             1: ef.Style(background_color="#cbf4c9", bold=True),
         },
     )
-    rendered = ef.render(component, component)
+    html, _attachments = ef.render(component, component)
 
-    Path("example.html").write_text(rendered)
+    Path("example.html").write_text(html)
 
 
 if __name__ == "__main__":

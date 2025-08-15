@@ -1,4 +1,5 @@
 import json
+from email.mime.application import MIMEApplication
 from functools import lru_cache
 from importlib.resources import files
 
@@ -63,12 +64,16 @@ def mjml2html(
 
 def render(
     *components: Component,
-) -> str:
+) -> tuple[str, list[MIMEApplication]]:
     parts: list[str] = []
+    attachments: list[MIMEApplication] = []
     for component in components:
-        parts.append(RENDER_MAP[type(component)](component))
+        body, cur_attachments = RENDER_MAP[type(component)](component)
+        parts.append(body)
+        attachments.extend(cur_attachments)
     body_str = _render(
         "index",
         content="".join(parts),
     )
-    return mjml2html(body_str)
+    html = mjml2html(body_str)
+    return html, attachments
