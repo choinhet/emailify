@@ -49,7 +49,11 @@ def table_with_merged_headers():
     df = pd.DataFrame(
         {
             "hello2": [1, 2, 3],
-            "hello": ["My", "Name", "Is"],
+            "hello": [
+                "My",
+                ef.Link(text="Google", href="https://www.google.com"),
+                "Is",
+            ],
             "Really long column name": [1, 2, 3],
             "hello3": [1, 2, 3],
         }

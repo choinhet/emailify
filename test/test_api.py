@@ -23,7 +23,11 @@ def test_api():
     df = pd.DataFrame(
         {
             "hello2": [1, 2, 3],
-            "hello": ["My", "Name", "Is"],
+            "hello": [
+                "My",
+                ef.Link(text="Google", href="https://www.google.com"),
+                "Is",
+            ],
             "hello3": ["My", "Name", "Is"],
             "Really long column name": [1, 2, 3],
             "hello4": ["This is a long column name"] * 3,

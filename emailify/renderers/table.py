@@ -1,17 +1,34 @@
 import re
-from typing import Dict, List, Optional, Tuple
-
 from email.mime.application import MIMEApplication
+from tkinter import Image
+from typing import Any, Dict, List, Optional, Text, Tuple
 
 from PIL import ImageFont
 
-from emailify.models import Style, Table
+from emailify.models import Component, Fill, Link, Style, Table
 from emailify.renderers.core import _render
+from emailify.renderers.fill import render_fill
+from emailify.renderers.image import render_image
+from emailify.renderers.link import render_link
 from emailify.renderers.style import merge_styles, render_style
+from emailify.renderers.text import render_text
 from emailify.styles.table_default import COL_STYLE, HEADER_STYLE
 
 DEFAULT_FONT_FAMILY = "Arial"
 DEFAULT_FONT_SIZE = 11
+
+TABLE_RENDER_MAP = {
+    Text: render_text,
+    Fill: render_fill,
+    Image: render_image,
+    Link: render_link,
+}
+
+
+def _render_component(
+    component: Component,
+) -> tuple[str, list[MIMEApplication]]:
+    return TABLE_RENDER_MAP[type(component)](component)
 
 
 def _get_text_size(
@@ -58,7 +75,22 @@ def render_style_dict(style_dict: Dict[str, Style]) -> Dict[str, str]:
     }
 
 
+EXTRA_ATTACHMENTS: list[MIMEApplication] = []
+
+
+def maybe_render_nested(cell: Any) -> Any:
+    if not isinstance(cell, Component):
+        return cell
+    body, attachments = _render_component(cell)
+    EXTRA_ATTACHMENTS.extend(attachments)
+    return body
+
+
 def render_table(table: Table) -> tuple[str, list[MIMEApplication]]:
+    global EXTRA_ATTACHMENTS
+    EXTRA_ATTACHMENTS = []
+
+    table.data = table.data.map(maybe_render_nested)
     row_styles: Dict[int, str] = {}
     header_styles: Dict[str, str] = {}
     col_styles: Dict[str, str] = {}
@@ -172,4 +204,4 @@ def render_table(table: Table) -> tuple[str, list[MIMEApplication]]:
         headers_render=headers_render,
         body_nowrap_cols=body_nowrap_cols,
     )
-    return body, []
+    return body, EXTRA_ATTACHMENTS

@@ -51,6 +51,12 @@ html, attachments = ef.render(
 
 
 ### Basic Table
+
+#### Extra
+
+Tables can also handle nested components.
+
+
 ```python
 import pandas as pd
 import emailify as ef
