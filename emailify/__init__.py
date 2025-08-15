@@ -3,11 +3,12 @@ __all__ = [
     "Component",
     "Table",
     "Text",
+    "Link",
     "Fill",
     "Image",
     "Table",
     "Style",
 ]
 
-from emailify.models import Component, Fill, Image, Style, Table, Text
+from emailify.models import Component, Fill, Image, Link, Style, Table, Text
 from emailify.renderers.api import render

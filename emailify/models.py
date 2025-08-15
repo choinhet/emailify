@@ -69,6 +69,13 @@ class Text(Component):
     height: float = Field(default=1)
 
 
+class Link(Component):
+    text: str
+    href: str
+    width: float = Field(default=1)
+    height: float = Field(default=1)
+
+
 class Fill(Component):
     width: str = Field(default="100%")
     height: str = Field(default="20px")

@@ -60,6 +60,7 @@ def table_with_merged_headers():
             text="Hello, this is a table with merged headers",
             style=ef.Style(background_color="#cbf4c9", padding_left="5px"),
         ),
+        ef.Link(text="Hello", href="https://www.google.com"),
         ef.Table(
             data=df,
             merge_equal_headers=True,

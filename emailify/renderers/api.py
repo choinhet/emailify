@@ -5,10 +5,11 @@ from importlib.resources import files
 
 from quickjs import Context
 
-from emailify.models import Component, Fill, Image, Table, Text
+from emailify.models import Component, Fill, Image, Link, Table, Text
 from emailify.renderers.core import _render
 from emailify.renderers.fill import render_fill
 from emailify.renderers.image import render_image
+from emailify.renderers.link import render_link
 from emailify.renderers.table import render_table
 from emailify.renderers.text import render_text
 
@@ -17,6 +18,7 @@ RENDER_MAP = {
     Text: render_text,
     Fill: render_fill,
     Image: render_image,
+    Link: render_link,
 }
 
 
