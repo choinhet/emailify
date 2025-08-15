@@ -7,6 +7,7 @@ import pytest
 from PIL import Image as PILImage
 
 import emailify as ef
+from emailify.renderers.render_mjml import mjml2html
 
 
 def test_api():
@@ -41,6 +42,7 @@ def test_api():
             style=ef.Style(background_color="#cbf4c9", padding_left="5"),
         ),
         ef.Link(text="Hello", href="https://www.google.com"),
+        ef.Link(text="Hello", href="www.google.com"),
         ef.Table(
             data=df,
             merge_equal_headers=True,
@@ -73,6 +75,11 @@ def test_api():
     assert html is not None
     # Two images added above should yield two attachments
     assert len(attachments) == 2
+
+
+def test_invalid_mjml():
+    with pytest.raises(RuntimeError):
+        mjml2html("invalid")
 
 
 if __name__ == "__main__":
