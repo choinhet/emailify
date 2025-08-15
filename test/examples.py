@@ -62,7 +62,11 @@ def table_with_merged_headers():
     html, _attachments = ef.render(
         ef.Text(
             text="Hello, this is a table with merged headers",
-            style=ef.Style(background_color="#cbf4c9", padding_left="5px", bold=True),
+            style=ef.Style(
+                background_color="#cbf4c9",
+                padding_left="5px",
+                bold=True
+                ),
         ),
         ef.Link(text="Hello", href="https://www.google.com"),
         ef.Table(
@@ -81,7 +85,11 @@ def table_with_merged_headers():
                 "hello3": ef.Style(background_color="#0d0d0", bold=True),
             },
             row_style={
-                1: ef.Style(background_color="#cbf4c9", bold=True),
+                1: ef.Style(
+                    background_color="#cbf4c9",
+                    bold=True,
+                    font_color="#d83d3d",
+                ),
             },
             column_widths={
                 "hello": 10,

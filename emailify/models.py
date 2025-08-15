@@ -94,7 +94,7 @@ class Table(Component):
     body_style: Style = Field(default_factory=Style)
     column_style: Dict[str, Style] = Field(default_factory=dict)
     column_widths: Dict[str, float] = Field(default_factory=dict)
-    row_style: Dict[float, Style] = Field(default_factory=dict)
+    row_style: Dict[int, Style] = Field(default_factory=dict)
     max_col_width: Optional[float] = Field(default=None)
     header_filters: bool = Field(default=True)
     default_style: bool = Field(default=True)

@@ -3,7 +3,7 @@ from email.mime.application import MIMEApplication
 from html.parser import HTMLParser
 from io import StringIO
 from tkinter import Image
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from PIL import ImageFont
 
@@ -116,7 +116,7 @@ def _compute_header_merge_spans(
     return span_by_start, contiguous_only
 
 
-def render_style_dict(style_dict: Dict[str, Style]) -> Dict[str, str]:
+def render_style_dict(style_dict: Dict[Union[str, int], Style]) -> Dict[str, str]:
     return {
         c: render_style(cur)
         for c in style_dict.keys()
@@ -140,9 +140,8 @@ def render_table(table: Table) -> tuple[str, list[MIMEApplication]]:
     EXTRA_ATTACHMENTS = []
 
     table.data = table.data.map(maybe_render_nested)
-    row_styles: Dict[int, str] = {}
-    header_styles: Dict[str, str] = {}
-    col_styles: Dict[str, str] = {}
+    header_styles: Dict[str, Style] = {}
+    col_styles: Dict[str, Style] = {}
     col_widths: Dict[str, int] = {}
     header_spans_by_start: Dict[int, int] = {}
     skip_header_indices: set[int] = set()
@@ -247,7 +246,7 @@ def render_table(table: Table) -> tuple[str, list[MIMEApplication]]:
         table=table,
         header_styles=render_style_dict(header_styles),
         col_styles=render_style_dict(col_styles),
-        row_styles=render_style_dict(row_styles),
+        row_styles=render_style_dict(table.row_style),
         body_style=render_style(table.body_style),
         col_widths=col_widths,
         headers_render=headers_render,
