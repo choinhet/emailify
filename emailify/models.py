@@ -1,6 +1,6 @@
 from io import BytesIO
 from os import PathLike
-from typing import Dict, Literal, Optional, Union
+from typing import Any, Callable, Dict, Literal, Optional, Union
 
 import pandas as pd
 from pydantic import BaseModel, Field
@@ -92,7 +92,9 @@ class Table(Component):
     data: pd.DataFrame
     header_style: Dict[str, Style] = Field(default_factory=dict)
     body_style: Style = Field(default_factory=Style)
-    column_style: Dict[str, Style] = Field(default_factory=dict)
+    column_style: Dict[str, Union[Style, Callable[[Any], Style]]] = Field(
+        default_factory=dict
+    )
     column_widths: Dict[str, float] = Field(default_factory=dict)
     row_style: Dict[int, Style] = Field(default_factory=dict)
     max_col_width: Optional[float] = Field(default=None)

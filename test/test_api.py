@@ -69,7 +69,16 @@ def test_api():
         ef.Image(data=img, format="png", width="600px"),
         ef.Image(data=buf, format="png", width="600px"),
         ef.Table(data=df).with_stripes(),
-        ef.Table(data=sec_df),
+        ef.Table(
+            data=sec_df,
+            column_style={
+                "hello": lambda x: (
+                    ef.Style(background_color="#000000", font_color="#ffffff")
+                    if x == "My"
+                    else None
+                ),
+            },
+        ),
     )
     shutil.rmtree(temp_path, ignore_errors=True)
     assert html is not None
